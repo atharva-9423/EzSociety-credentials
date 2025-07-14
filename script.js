@@ -1,6 +1,5 @@
-
 import { database } from './firebase-config.js';
-import { ref, set, get, child, push, remove, update } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+import { ref, get, set, update } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
 // Real password database from the credentials file
 const passwordDatabase = {
@@ -67,6 +66,84 @@ const wingConfig = {
   'F': { floors: 6, flatsPerFloor: 4 }
 };
 
+// Store or update resident data with view tracking
+async function storeResidentData(flatNumber, mobile, name, password) {
+  try {
+    const timestamp = Date.now();
+    const residentRef = ref(database, `residents/${flatNumber}`);
+
+    // Check if resident already exists
+    const snapshot = await get(residentRef);
+
+    if (snapshot.exists()) {
+      const existingData = snapshot.val();
+      // Update existing resident data
+      await update(residentRef, {
+        mobile: mobile,
+        name: name,
+        password: password,
+        lastAccessedAt: timestamp,
+        viewCount: (existingData.viewCount || 0) + 1
+      });
+    } else {
+      // Create new resident data
+      const residentData = {
+        flatNumber: flatNumber,
+        password: password,
+        mobile: mobile,
+        name: name,
+        createdAt: timestamp,
+        lastAccessedAt: timestamp,
+        viewCount: 1,
+        forgotPasswordUsed: false,
+        adminReset: false
+      };
+
+      await set(residentRef, residentData);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error storing resident data:', error);
+    throw error;
+  }
+}
+
+// Check if resident can still view their password
+async function checkResidentAccess(flatNumber, mobile) {
+  try {
+    const residentRef = ref(database, `residents/${flatNumber}`);
+    const snapshot = await get(residentRef);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      // Check if mobile number matches
+      if (data.mobile === mobile) {
+        const viewCount = data.viewCount || 0;
+        return {
+          hasAccess: viewCount < 2,
+          viewCount: viewCount,
+          canView: viewCount < 2,
+          existingData: data
+        };
+      }
+    }
+    return {
+      hasAccess: true,
+      viewCount: 0,
+      canView: true,
+      existingData: null
+    };
+  } catch (error) {
+    console.error('Error checking resident access:', error);
+    return {
+      hasAccess: false,
+      viewCount: 0,
+      canView: false,
+      existingData: null
+    };
+  }
+}
 // Generate a random token for one-time links
 function generateToken() {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -75,6 +152,8 @@ function generateToken() {
 // Update floor options based on selected wing
 function updateFloorOptions() {
   const selectedWing = wingSelect.value;
+  
+  // Clear floor and flat dropdowns
   floorSelect.innerHTML = '<option value="">Select Floor</option>';
   flatSelect.innerHTML = '<option value="">Select Flat</option>';
 
@@ -86,6 +165,12 @@ function updateFloorOptions() {
       option.textContent = `Floor ${i}`;
       floorSelect.appendChild(option);
     }
+    
+    // Enable floor dropdown
+    floorSelect.disabled = false;
+  } else {
+    floorSelect.disabled = true;
+    flatSelect.disabled = true;
   }
 }
 
@@ -93,9 +178,11 @@ function updateFloorOptions() {
 function updateFlatOptions() {
   const selectedWing = wingSelect.value;
   const selectedFloor = floorSelect.value;
+  
+  // Clear flat dropdown
   flatSelect.innerHTML = '<option value="">Select Flat</option>';
 
-  if (selectedWing && selectedFloor) {
+  if (selectedWing && selectedFloor && wingConfig[selectedWing]) {
     const flatsPerFloor = wingConfig[selectedWing].flatsPerFloor;
     for (let i = 1; i <= flatsPerFloor; i++) {
       const flatNumber = `${selectedWing}${selectedFloor}0${i}`;
@@ -104,62 +191,11 @@ function updateFlatOptions() {
       option.textContent = `${selectedWing}-${selectedFloor}0${i}`;
       flatSelect.appendChild(option);
     }
-  }
-}
-
-// Check if resident has already accessed their password
-async function checkResidentAccess(flatNumber, mobile) {
-  try {
-    // Use once('value') for potentially faster reads
-    const residentRef = ref(database, `residents/${flatNumber}`);
-    const snapshot = await get(residentRef);
-
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      // Check if mobile matches and they have accessed before
-      if (data.mobile === mobile && data.accessed) {
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    console.error('Error checking resident access:', error);
-    return false; // Default to allowing access if check fails
-  }
-}
-
-// Create one-time link in Firebase
-async function createOneTimeLink(flatNumber, mobile, name, password) {
-  try {
-    const token = generateToken();
-    const timestamp = Date.now();
-
-    // Store one-time link data
-    const linkRef = ref(database, `one_time_links/${token}`);
-    await set(linkRef, {
-      flatNumber: flatNumber,
-      password: password,
-      mobile: mobile,
-      name: name,
-      createdAt: timestamp,
-      used: false
-    });
-
-    // Store resident data (but mark as not accessed yet)
-    const residentRef = ref(database, `residents/${flatNumber}`);
-    await set(residentRef, {
-      mobile: mobile,
-      name: name,
-      password: password,
-      accessed: false,
-      tokenCreatedAt: timestamp
-    });
-
-    return token;
-  } catch (error) {
-    console.error('Error creating one-time link:', error);
-    throw error;
+    
+    // Enable flat dropdown
+    flatSelect.disabled = false;
+  } else {
+    flatSelect.disabled = true;
   }
 }
 
@@ -218,43 +254,50 @@ async function handlePasswordLookup(e) {
   // Show loading animation
   showLoading();
 
-  try {
-    // Check if resident has already accessed their password
-    const hasAccessed = await checkResidentAccess(flat, phone);
-    if (hasAccessed) {
-      hideLoading();
-      showError('You have already accessed your password. Contact society office if you need it again.');
-      return;
-    }
+  // Check if resident can still view their password
+  const accessInfo = await checkResidentAccess(flat, phone);
 
-    const password = passwordDatabase[flat];
-
-    // Create one-time link
-    const token = await createOneTimeLink(flat, phone, name, password);
-    const link = `${window.location.origin}/password.html?token=${token}`;
-
+  if (!accessInfo.canView) {
     hideLoading();
-    showPasswordLink(link);
-
-  } catch (error) {
-    console.error('Error:', error);
-    hideLoading();
-    showError('An error occurred. Please try again or contact society office.');
+    showError(`You have already viewed your password ${accessInfo.viewCount} times. Contact society admin to reset your access.`);
+    return;
   }
+
+  const password = passwordDatabase[flat];
+
+  // Store/update resident data and increment view count
+  await storeResidentData(flat, phone, name, password);
+
+  hideLoading();
+  showPasswordDirect(password, flat, name, phone, accessInfo.viewCount + 1);
 }
 
-function showPasswordLink(link) {
-  passwordLink.innerHTML = `
-    <a href="${link}" target="_blank" class="password-link-btn">
-      Click here to view your password
-    </a>
-    <br><br>
-    <small>Link: ${link}</small>
+function showPasswordDirect(password, flatNumber, name, mobile, viewCount) {
+  const passwordDisplay = resultDiv.querySelector('.password-display');
+  const remainingViews = 2 - viewCount;
+
+  passwordDisplay.innerHTML = `
+    <h3>Your Password</h3>
+    <div class="password-info">
+      <div class="password-value" style="background: #21262d; border: 2px solid #3fb950; border-radius: 8px; padding: 1rem; font-size: 1.5rem; font-weight: bold; color: #3fb950; letter-spacing: 2px; margin: 1rem 0; word-break: break-all;">${password}</div>
+      <div class="flat-info" style="background: linear-gradient(145deg, #161b22, #21262d); border: 1px solid #373e47; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; text-align: left;">
+        <p><strong>Flat Number:</strong> ${flatNumber.replace(/^([A-F])(\d+)/, '$1-$2')}</p>
+        <p><strong>Resident:</strong> ${name}</p>
+        <p><strong>Mobile:</strong> ${mobile}</p>
+        <p><strong>Views Used:</strong> ${viewCount} of 2</p>
+        <p><strong>Remaining Views:</strong> ${remainingViews}</p>
+      </div>
+      <p class="warning" style="color: #ff7b72; font-weight: 500; margin: 1.5rem 0; padding: 1rem; background: rgba(255, 123, 114, 0.1); border: 1px solid rgba(255, 123, 114, 0.2); border-radius: 8px;">
+        ⚠️ You can only view your password ${remainingViews} more time${remainingViews !== 1 ? 's' : ''}. After that, contact admin to reset your access.
+      </p>
+      <button onclick="copyPassword('${password}')" class="copy-btn" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #58a6ff, #79c0ff); color: #0d1117; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin: 1rem 0;">
+        📋 Copy Password
+      </button>
+    </div>
   `;
+
   resultDiv.style.display = 'block';
   errorDiv.style.display = 'none';
-
-  // Scroll to result
   resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -272,6 +315,35 @@ function hideResults() {
   errorDiv.style.display = 'none';
 }
 
+// Copy password to clipboard
+function copyPassword(password) {
+  navigator.clipboard.writeText(password).then(() => {
+    const copyBtn = document.querySelector('.copy-btn');
+    if (copyBtn) {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = '✅ Copied!';
+      copyBtn.style.background = 'linear-gradient(135deg, #3fb950, #2ea043)';
+
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.style.background = 'linear-gradient(135deg, #58a6ff, #79c0ff)';
+      }, 2000);
+    }
+  }).catch(err => {
+    console.error('Failed to copy password:', err);
+    const copyBtn = document.querySelector('.copy-btn');
+    if (copyBtn) {
+      copyBtn.textContent = '❌ Copy Failed';
+      setTimeout(() => {
+        copyBtn.textContent = '📋 Copy Password';
+      }, 2000);
+    }
+  });
+}
+
+// Make copy function global
+window.copyPassword = copyPassword;
+
 // Global functions for buttons
 window.clearResult = function() {
   hideResults();
@@ -284,10 +356,32 @@ window.clearError = function() {
 
 // Initialize dropdowns and event listeners after DOM is ready
 function initializeDropdowns() {
-  // Event listeners
-  if (wingSelect) wingSelect.addEventListener('change', updateFloorOptions);
-  if (floorSelect) floorSelect.addEventListener('change', updateFlatOptions);
-  if (form) form.addEventListener('submit', handlePasswordLookup);
+  // Initialize dropdown states
+  if (floorSelect) {
+    floorSelect.disabled = true;
+  }
+  if (flatSelect) {
+    flatSelect.disabled = true;
+  }
+
+  // Event listeners with immediate execution
+  if (wingSelect) {
+    wingSelect.addEventListener('change', function(e) {
+      console.log('Wing changed to:', e.target.value);
+      updateFloorOptions();
+    });
+  }
+  
+  if (floorSelect) {
+    floorSelect.addEventListener('change', function(e) {
+      console.log('Floor changed to:', e.target.value);
+      updateFlatOptions();
+    });
+  }
+  
+  if (form) {
+    form.addEventListener('submit', handlePasswordLookup);
+  }
 
   // Initialize phone input to only accept numbers
   if (phoneInput) {
@@ -306,8 +400,15 @@ function initializeDropdowns() {
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize immediately
+  initializeDropdowns();
+  
   // Wait for skeleton loading to complete
-  setTimeout(initializeDropdowns, 1600);
+  setTimeout(function() {
+    removeSkeletonLoading();
+    // Re-initialize to ensure everything is working
+    initializeDropdowns();
+  }, 1600);
 });
 
 // Remove skeleton loading from form elements
@@ -316,7 +417,7 @@ function removeSkeletonLoading() {
   skeletonElements.forEach(element => {
     element.classList.remove('skeleton-loader');
   });
-  
+
   // Enable form elements
   const formElements = document.querySelectorAll('select, input, button');
   formElements.forEach(element => {
@@ -337,7 +438,7 @@ function checkAdminURL() {
 // Initialize admin URL check
 document.addEventListener('DOMContentLoaded', function() {
   checkAdminURL();
-  
+
   // Remove skeleton loading and enable form after 1.5 seconds
   setTimeout(removeSkeletonLoading, 1500);
 });
