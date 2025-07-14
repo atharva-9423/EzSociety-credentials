@@ -2,13 +2,77 @@
 import { database } from './firebase-config.js';
 import { ref, get, set, remove, update } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
+// Admin credentials (you can change these)
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'admin@trimurti9423';
+
 // DOM elements
+const adminLogin = document.getElementById('adminLogin');
+const adminPanel = document.getElementById('adminPanel');
+const loginForm = document.getElementById('adminLoginForm');
+const loginError = document.getElementById('loginError');
+const loginErrorMessage = document.getElementById('loginErrorMessage');
+const logoutBtn = document.getElementById('logoutBtn');
 const residentsList = document.getElementById('residents-list');
 const linksList = document.getElementById('links-list');
 const refreshBtn = document.getElementById('refresh-btn');
 const clearDataBtn = document.getElementById('clear-data-btn');
 const exportBtn = document.getElementById('export-btn');
 const statsDiv = document.getElementById('stats');
+
+// Check if user is already logged in
+function checkLoginStatus() {
+  const isLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+  if (isLoggedIn) {
+    showAdminPanel();
+  } else {
+    showLoginForm();
+  }
+}
+
+// Show admin panel
+function showAdminPanel() {
+  adminLogin.style.display = 'none';
+  adminPanel.style.display = 'block';
+  logoutBtn.style.display = 'block';
+  loadData();
+}
+
+// Show login form
+function showLoginForm() {
+  adminLogin.style.display = 'block';
+  adminPanel.style.display = 'none';
+  logoutBtn.style.display = 'none';
+  loginError.style.display = 'none';
+}
+
+// Handle login form submission
+function handleLogin(event) {
+  event.preventDefault();
+  
+  const username = document.getElementById('adminUsername').value;
+  const password = document.getElementById('adminPassword').value;
+  
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    sessionStorage.setItem('adminLoggedIn', 'true');
+    showAdminPanel();
+  } else {
+    loginErrorMessage.textContent = 'Invalid username or password';
+    loginError.style.display = 'block';
+  }
+}
+
+// Handle logout
+function logout() {
+  sessionStorage.removeItem('adminLoggedIn');
+  showLoginForm();
+  // Clear form
+  document.getElementById('adminUsername').value = '';
+  document.getElementById('adminPassword').value = '';
+}
+
+// Make logout function global
+window.logout = logout;
 
 // Load and display residents data
 async function loadResidents() {
@@ -66,32 +130,35 @@ function displayResidents(residents) {
 
     html += `
       <div class="resident-card">
-        <div class="resident-header">
-          <h3>Flat ${flatNumber}</h3>
-          <div class="resident-actions">
+        <div class="card-header">
+          <h3><i class="fas fa-home"></i> Flat ${flatNumber}</h3>
+          <div class="card-actions">
             <button class="action-btn reset-btn" onclick="resetResidentAccess('${flatNumber}')">
-              <i class="fas fa-undo"></i> Reset Access
+              <i class="fas fa-undo"></i> Reset
             </button>
             <button class="action-btn delete-btn" onclick="deleteResident('${flatNumber}')">
               <i class="fas fa-trash"></i> Delete
             </button>
           </div>
         </div>
-        <div class="resident-details">
+        <div class="card-details">
           <p><strong>Name:</strong> ${data.name}</p>
           <p><strong>Mobile:</strong> ${data.mobile}</p>
           <p><strong>Password:</strong> ${data.password}</p>
           <p><strong>Registered:</strong> ${registrationDate}</p>
-          <p><strong>Password Accessed:</strong> ${accessedStatus}</p>
-          <p><strong>Last Accessed:</strong> ${accessedDate}</p>
-          <p><strong>Forget Password Used:</strong> ${forgotStatus}</p>
+          <p><strong>Accessed:</strong> ${accessedStatus}</p>
+          <p><strong>Last Access:</strong> ${accessedDate}</p>
+          <p><strong>Forgot Used:</strong> ${forgotStatus}</p>
           <p><strong>Last Reset:</strong> ${resetDate}</p>
         </div>
       </div>
     `;
   }
 
-  residentsList.innerHTML = html;
+  residentsList.innerHTML = html || '<p class="no-data">No residents found</p>';
+  
+  // Setup search functionality after rendering residents
+  setupResidentsSearch();
   
   // Update stats
   updateStats(totalResidents, accessedCount, forgotPasswordUsed);
@@ -117,16 +184,16 @@ function displayOneTimeLinks(links) {
 
     html += `
       <div class="link-card">
-        <div class="link-header">
-          <h4>Token: ${token.substring(0, 20)}...</h4>
-          <div class="link-actions">
+        <div class="card-header">
+          <h4><i class="fas fa-link"></i> ${token.substring(0, 15)}...</h4>
+          <div class="card-actions">
             <span class="status ${statusClass}">${status}</span>
             <button class="action-btn delete-btn" onclick="deleteLink('${token}')">
               <i class="fas fa-trash"></i> Delete
             </button>
           </div>
         </div>
-        <div class="link-details">
+        <div class="card-details">
           <p><strong>Flat:</strong> ${data.flatNumber}</p>
           <p><strong>Name:</strong> ${data.name}</p>
           <p><strong>Mobile:</strong> ${data.mobile}</p>
@@ -137,7 +204,7 @@ function displayOneTimeLinks(links) {
     `;
   }
 
-  linksList.innerHTML = html;
+  linksList.innerHTML = html || '<p class="no-data">No one-time links found</p>';
 }
 
 // Update statistics
@@ -148,24 +215,24 @@ function updateStats(totalResidents, accessedCount, forgotPasswordUsed) {
   statsDiv.innerHTML = `
     <div class="stats-grid">
       <div class="stat-card">
-        <h3>${totalResidents}</h3>
+        <h3><i class="fas fa-users"></i> ${totalResidents}</h3>
         <p>Total Residents</p>
       </div>
       <div class="stat-card">
-        <h3>${accessedCount}</h3>
-        <p>Accessed Passwords</p>
+        <h3><i class="fas fa-check-circle"></i> ${accessedCount}</h3>
+        <p>Passwords Accessed</p>
       </div>
       <div class="stat-card">
-        <h3>${accessRate}%</h3>
+        <h3><i class="fas fa-percentage"></i> ${accessRate}%</h3>
         <p>Access Rate</p>
       </div>
       <div class="stat-card">
-        <h3>${forgotPasswordUsed}</h3>
-        <p>Forgot Password Used</p>
+        <h3><i class="fas fa-key"></i> ${forgotPasswordUsed}</h3>
+        <p>Password Resets</p>
       </div>
       <div class="stat-card">
-        <h3>${forgotRate}%</h3>
-        <p>Forgot Password Rate</p>
+        <h3><i class="fas fa-chart-line"></i> ${forgotRate}%</h3>
+        <p>Reset Rate</p>
       </div>
     </div>
   `;
@@ -338,12 +405,38 @@ window.deleteLink = deleteLink;
 window.clearAllData = clearAllData;
 window.exportData = exportData;
 
+// Search functionality for residents
+function setupResidentsSearch() {
+  const searchInput = document.getElementById('residentsSearch');
+  if (searchInput) {
+    searchInput.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const residentCards = document.querySelectorAll('.resident-card');
+      
+      residentCards.forEach(card => {
+        const flatNumberElement = card.querySelector('.card-header h3');
+        if (flatNumberElement) {
+          const flatNumber = flatNumberElement.textContent.toLowerCase();
+          if (flatNumber.includes(searchTerm)) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        }
+      });
+    });
+  }
+}
+
 // Event listeners
+loginForm.addEventListener('submit', handleLogin);
 refreshBtn.addEventListener('click', loadData);
 clearDataBtn.addEventListener('click', clearAllData);
 exportBtn.addEventListener('click', exportData);
 
-// Load data on page load
-document.addEventListener('DOMContentLoaded', loadData);
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  checkLoginStatus();
+});
 
 console.log('Admin system initialized');
