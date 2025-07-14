@@ -1,5 +1,6 @@
+
 import { database } from './firebase-config.js';
-import { ref, get, update, remove, set } from 'firebase/database';
+import { ref, get, update, remove, set } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
 // Wing configuration
 const wingConfig = {
