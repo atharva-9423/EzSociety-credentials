@@ -6,36 +6,318 @@
   <meta name="viewport" content="width=device-width">
   <title>Admin Panel - Society Visitor Tracking</title>
   <link href="homepage-style.css" rel="stylesheet" type="text/css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     .admin-container {
-      max-width: 800px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 2rem;
     }
-    
+
     .admin-login {
-      max-width: 400px;
-      margin: 2rem auto;
+      max-width: 450px;
+      margin: 4rem auto;
     }
-    
+
     .admin-panel {
       display: none;
     }
-    
-    .form-container {
-      background: #1c2128;
+
+    /* Header Section */
+    .admin-header {
+      background: linear-gradient(135deg, #1c2128, #21262d);
       border: 1px solid #30363d;
       border-radius: 16px;
       padding: 2rem;
-      box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-header h1 {
+      color: #f0f6fc;
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+
+    .admin-header p {
+      color: #8b949e;
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    /* Stats Grid */
+    .stats-section {
       margin-bottom: 2rem;
     }
-    
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(145deg, #1c2128, #21262d);
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-card h3 {
+      color: #58a6ff;
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+      font-weight: 700;
+    }
+
+    .stat-card p {
+      color: #8b949e;
+      margin: 0;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      background: linear-gradient(145deg, #1c2128, #21262d);
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .control-panel h3 {
+      color: #f0f6fc;
+      margin: 0 0 1.5rem 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .control-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .control-btn {
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: white;
+    }
+
+    .control-btn.primary {
+      background: linear-gradient(135deg, #58a6ff, #79c0ff);
+      color: #0d1117;
+    }
+
+    .control-btn.success {
+      background: linear-gradient(135deg, #3fb950, #2ea043);
+    }
+
+    .control-btn.danger {
+      background: linear-gradient(135deg, #f85149, #da3633);
+    }
+
+    .control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Data Sections */
+    .data-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    .data-section {
+      background: linear-gradient(145deg, #1c2128, #21262d);
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .data-section h3 {
+      color: #f0f6fc;
+      margin: 0 0 1.5rem 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    .data-content {
+      max-height: 600px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .data-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .data-content::-webkit-scrollbar-track {
+      background: #21262d;
+      border-radius: 3px;
+    }
+
+    .data-content::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 3px;
+    }
+
+    .data-content::-webkit-scrollbar-thumb:hover {
+      background: #484f58;
+    }
+
+    /* Cards */
+    .resident-card, .link-card {
+      background: linear-gradient(145deg, #21262d, #30363d);
+      border: 1px solid #373e47;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .resident-card:hover, .link-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #373e47;
+    }
+
+    .card-header h3, .card-header h4 {
+      color: #f0f6fc;
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .action-btn.reset-btn {
+      background: linear-gradient(135deg, #fd7e14, #e55a00);
+      color: white;
+    }
+
+    .action-btn.delete-btn {
+      background: linear-gradient(135deg, #f85149, #da3633);
+      color: white;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .card-details p {
+      color: #e6edf3;
+      margin: 0;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      background: rgba(33, 38, 45, 0.5);
+      border-radius: 6px;
+    }
+
+    .card-details strong {
+      color: #8b949e;
+      font-weight: 500;
+    }
+
+    /* Status badges */
+    .status {
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-active {
+      background: linear-gradient(135deg, #3fb950, #2ea043);
+      color: white;
+    }
+
+    .status-used {
+      background: linear-gradient(135deg, #8b949e, #6e7681);
+      color: white;
+    }
+
+    /* Login Form */
+    .login-form {
+      background: linear-gradient(145deg, #1c2128, #21262d);
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
     .form-group {
       margin-bottom: 1.5rem;
     }
-    
+
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
@@ -43,8 +325,8 @@
       color: #f0f6fc;
       font-size: 0.9rem;
     }
-    
-    .form-group input, .form-group select {
+
+    .form-group input {
       width: 100%;
       padding: 0.875rem;
       background: #21262d;
@@ -54,26 +336,16 @@
       color: #e6edf3;
       transition: all 0.3s ease;
     }
-    
-    .form-group input:focus, .form-group select:focus {
+
+    .form-group input:focus {
       outline: none;
       border-color: #58a6ff;
       box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
     }
-    
-    .form-group input::placeholder {
-      color: #8b949e;
-    }
-    
-    .form-group small {
-      margin-top: 0.25rem;
-      color: #8b949e;
-      font-size: 0.8rem;
-      display: block;
-    }
-    
-    .admin-btn {
-      padding: 0.875rem 2rem;
+
+    .login-btn {
+      width: 100%;
+      padding: 1rem;
       background: linear-gradient(135deg, #58a6ff, #79c0ff);
       color: #0d1117;
       border: none;
@@ -82,190 +354,146 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      width: 100%;
-      box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
     }
-    
-    .admin-btn:hover {
+
+    .login-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+      box-shadow: 0 6px 20px rgba(88, 166, 255, 0.3);
     }
-    
-    .admin-btn:disabled {
-      background: #30363d;
-      color: #8b949e;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .resident-list {
-      background: #1c2128;
-      border: 1px solid #30363d;
-      border-radius: 16px;
-      padding: 2rem;
-      margin: 2rem 0;
-      box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .resident-list h3 {
-      color: #f0f6fc;
-      margin-top: 0;
-      margin-bottom: 1.5rem;
-      font-size: 1.25rem;
-    }
-    
-    .resident-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-      border-bottom: 1px solid #30363d;
-      color: #e6edf3;
-    }
-    
-    .resident-item:last-child {
-      border-bottom: none;
-    }
-    
-    .resident-item strong {
-      color: #f0f6fc;
-    }
-    
-    .resident-item small {
-      color: #8b949e;
-    }
-    
-    .resident-info {
-      flex: 1;
-    }
-    
-    .resident-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-    
-    .reset-btn {
-      padding: 0.5rem 1rem;
-      background: linear-gradient(135deg, #f85149, #da3633);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-    
-    .reset-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(248, 81, 73, 0.3);
-    }
-    
-    .reset-btn:disabled {
-      background: #30363d;
-      color: #8b949e;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .status-badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-    }
-    
-    .status-accessed {
-      background: linear-gradient(135deg, #f85149, #da3633);
-      color: white;
-    }
-    
-    .status-unused {
-      background: linear-gradient(135deg, #3fb950, #2ea043);
-      color: white;
-    }
-    
+
     .logout-btn {
       position: fixed;
       top: 2rem;
       right: 2rem;
-      padding: 0.5rem 1rem;
-      background: #30363d;
-      color: #e6edf3;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #6e7681, #8b949e);
+      color: white;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 0.9rem;
+      font-weight: 500;
       transition: all 0.3s ease;
-      z-index: 100;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    
+
     .logout-btn:hover {
-      background: #484f58;
+      background: linear-gradient(135deg, #8b949e, #6e7681);
       transform: translateY(-1px);
     }
-    
-    .error-container, .result-container {
-      background: #1c2128;
-      border: 1px solid #30363d;
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .error-container {
+      background: linear-gradient(145deg, #3d1a1a, #4a1f1f);
+      border: 1px solid #f85149;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
       text-align: center;
-      margin: 1rem 0;
     }
-    
+
     .error-message {
       color: #f85149;
       font-weight: 500;
-      margin: 1rem 0;
+      margin: 0;
     }
-    
-    .result-message {
-      color: #e6edf3;
-      margin: 1rem 0;
+
+    .no-data {
+      text-align: center;
+      color: #8b949e;
+      font-style: italic;
+      padding: 2rem;
     }
-    
-    .clear-btn {
-      padding: 0.5rem 1rem;
-      background: #30363d;
-      color: #e6edf3;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+
+    /* Search Container */
+    .search-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
       font-size: 0.9rem;
+      color: #e6edf3;
       transition: all 0.3s ease;
     }
-    
-    .clear-btn:hover {
-      background: #484f58;
-      transform: translateY(-1px);
+
+    .search-input:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
     }
-    
+
+    .search-input::placeholder {
+      color: #8b949e;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #8b949e;
+      pointer-events: none;
+    }
+
+    .resident-card.hidden {
+      display: none;
+    }
+
+    /* Mobile Responsive */
     @media (max-width: 768px) {
+      .admin-container {
+        padding: 1rem;
+      }
+
+      .data-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .control-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .card-details {
+        grid-template-columns: 1fr;
+      }
+
+      .card-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+
       .logout-btn {
         top: 1rem;
         right: 1rem;
-        padding: 0.4rem 0.8rem;
+        padding: 0.5rem 1rem;
         font-size: 0.8rem;
       }
-      
-      .resident-item {
-        flex-direction: column;
-        gap: 1rem;
-        text-align: center;
+
+      .admin-header h1 {
+        font-size: 2rem;
       }
-      
-      .resident-actions {
-        justify-content: center;
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-actions {
+        flex-direction: column;
       }
     }
   </style>
@@ -273,55 +501,93 @@
 
 <body>
   <main>
-    <div class="container">
-      <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">Logout</button>
-      
+    <div class="admin-container">
+      <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+
+      <!-- Login Section -->
       <div id="adminLogin" class="admin-login">
-        <div class="header">
-          <h1 class="title">Admin Access</h1>
-          <p class="subtitle">Secure administrative panel for password management</p>
+        <div class="admin-header">
+          <h1><i class="fas fa-shield-alt"></i> Admin Access</h1>
+          <p>Secure administrative panel for resident management</p>
         </div>
-        
-        <div class="form-container">
+
+        <div class="login-form">
           <form id="adminLoginForm">
             <div class="form-group">
-              <label for="adminUsername">Username:</label>
+              <label for="adminUsername"><i class="fas fa-user"></i> Username:</label>
               <input type="text" id="adminUsername" required placeholder="Enter admin username">
             </div>
             <div class="form-group">
-              <label for="adminPassword">Password:</label>
+              <label for="adminPassword"><i class="fas fa-lock"></i> Password:</label>
               <input type="password" id="adminPassword" required placeholder="Enter admin password">
             </div>
-            <button type="submit" class="admin-btn">Login to Admin Panel</button>
+            <button type="submit" class="login-btn">
+              <i class="fas fa-sign-in-alt"></i> Login to Admin Panel
+            </button>
           </form>
-          
+
           <div id="loginError" class="error-container" style="display: none;">
             <p class="error-message" id="loginErrorMessage"></p>
           </div>
         </div>
       </div>
 
+      <!-- Admin Panel -->
       <div id="adminPanel" class="admin-panel">
-        <div class="header">
-          <h1 class="title">Admin Panel</h1>
-          <p class="subtitle">Password Management System</p>
-        </div>
-        
-        <div class="form-container">
-          <button onclick="loadResidents()" class="admin-btn">Refresh Resident List</button>
+        <div class="admin-header">
+          <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+          <p>Comprehensive resident and visitor tracking management</p>
         </div>
 
-        <div id="residentsList" class="resident-list">
-          <h3>Registered Residents</h3>
-          <div id="residentsData">
-            <p style="color: #8b949e;">Click "Refresh Resident List" to load residents</p>
+        <!-- Statistics Section -->
+        <div class="stats-section">
+          <div id="stats">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h3>-</h3>
+                <p>Loading...</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div id="adminResult" class="result-container" style="display: none;">
-          <h3 id="adminResultTitle" style="color: #f0f6fc;">Action Completed</h3>
-          <p id="adminResultMessage" class="result-message"></p>
-          <button onclick="hideAdminResult()" class="clear-btn">OK</button>
+        <!-- Control Panel -->
+        <div class="control-panel">
+          <h3><i class="fas fa-cogs"></i> Quick Actions</h3>
+          <div class="control-buttons">
+            <button id="refresh-btn" class="control-btn primary">
+              <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+            <button id="export-btn" class="control-btn success">
+              <i class="fas fa-download"></i> Export Data
+            </button>
+            <button id="clear-data-btn" class="control-btn danger">
+              <i class="fas fa-trash-alt"></i> Clear All Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Sections -->
+        <div class="data-grid">
+          <div class="data-section">
+            <h3><i class="fas fa-users"></i> Registered Residents</h3>
+            <div class="search-container">
+              <input type="text" id="residentsSearch" placeholder="Search by flat number (e.g., A101)" class="search-input">
+              <i class="fas fa-search search-icon"></i>
+            </div>
+            <div class="data-content" id="residents-list">
+              <p class="no-data">Loading residents...</p>
+            </div>
+          </div>
+
+          <div class="data-section">
+            <h3><i class="fas fa-link"></i> One-Time Links</h3>
+            <div class="data-content" id="links-list">
+              <p class="no-data">Loading links...</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
