@@ -1,6 +1,7 @@
-// Firebase configuration
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
+
+// Firebase configuration using CDN for GitHub Pages compatibility
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getDatabase } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
 const firebaseConfig = {
   // Replace with your Firebase config
