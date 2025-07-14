@@ -1,5 +1,6 @@
+
 import { database } from './firebase-config.js';
-import { ref, set, get, child, push, remove, update } from 'firebase/database';
+import { ref, set, get, child, push, remove, update } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
 // Real password database from the credentials file
 const passwordDatabase = {
