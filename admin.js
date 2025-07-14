@@ -1,4 +1,3 @@
-
 import { database } from './firebase-config.js';
 import { ref, get, set, remove, update } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 
@@ -49,10 +48,10 @@ function showLoginForm() {
 // Handle login form submission
 function handleLogin(event) {
   event.preventDefault();
-  
+
   const username = document.getElementById('adminUsername').value;
   const password = document.getElementById('adminPassword').value;
-  
+
   if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
     sessionStorage.setItem('adminLoggedIn', 'true');
     showAdminPanel();
@@ -92,41 +91,35 @@ async function loadResidents() {
   }
 }
 
-// Load and display one-time links data
-async function loadOneTimeLinks() {
-  try {
-    const linksRef = ref(database, 'one_time_links');
-    const snapshot = await get(linksRef);
-
-    if (snapshot.exists()) {
-      const links = snapshot.val();
-      displayOneTimeLinks(links);
-    } else {
-      linksList.innerHTML = '<p class="no-data">No one-time links found.</p>';
-    }
-  } catch (error) {
-    console.error('Error loading one-time links:', error);
-    linksList.innerHTML = '<p class="error">Error loading one-time links data.</p>';
-  }
-}
-
 // Display residents data
 function displayResidents(residents) {
   let html = '';
   let totalResidents = 0;
   let accessedCount = 0;
   let forgotPasswordUsed = 0;
+  let passwordResets = 0;
 
   for (const [flatNumber, data] of Object.entries(residents)) {
     totalResidents++;
-    if (data.accessed) accessedCount++;
+    
+    // Count accessed residents (viewCount > 0)
+    const viewCount = data.viewCount || 0;
+    if (viewCount > 0) accessedCount++;
+    
+    // Count forgot password usage
     if (data.forgotPasswordUsed) forgotPasswordUsed++;
+    
+    // Count admin resets
+    if (data.adminReset) passwordResets++;
 
-    const accessedStatus = data.accessed ? 'Yes' : 'No';
+    const accessedStatus = viewCount > 0 ? `Yes (${viewCount}/2 views)` : 'No';
     const forgotStatus = data.forgotPasswordUsed ? 'Yes' : 'No';
-    const registrationDate = data.tokenCreatedAt ? new Date(data.tokenCreatedAt).toLocaleString() : 'N/A';
-    const accessedDate = data.accessedAt ? new Date(data.accessedAt).toLocaleString() : 'N/A';
+    const registrationDate = data.createdAt ? new Date(data.createdAt).toLocaleString() : 
+                           data.tokenCreatedAt ? new Date(data.tokenCreatedAt).toLocaleString() : 'N/A';
+    const accessedDate = data.lastAccessedAt ? new Date(data.lastAccessedAt).toLocaleString() : 
+                        data.accessedAt ? new Date(data.accessedAt).toLocaleString() : 'N/A';
     const resetDate = data.resetAt ? new Date(data.resetAt).toLocaleString() : 'N/A';
+    const forgotUsedDate = data.forgotPasswordUsedAt ? new Date(data.forgotPasswordUsedAt).toLocaleString() : 'N/A';
 
     html += `
       <div class="resident-card">
@@ -134,7 +127,7 @@ function displayResidents(residents) {
           <h3><i class="fas fa-home"></i> Flat ${flatNumber}</h3>
           <div class="card-actions">
             <button class="action-btn reset-btn" onclick="resetResidentAccess('${flatNumber}')">
-              <i class="fas fa-undo"></i> Reset
+              <i class="fas fa-undo"></i> Reset Views
             </button>
             <button class="action-btn delete-btn" onclick="deleteResident('${flatNumber}')">
               <i class="fas fa-trash"></i> Delete
@@ -142,75 +135,35 @@ function displayResidents(residents) {
           </div>
         </div>
         <div class="card-details">
-          <p><strong>Name:</strong> ${data.name}</p>
-          <p><strong>Mobile:</strong> ${data.mobile}</p>
-          <p><strong>Password:</strong> ${data.password}</p>
+          <p><strong>Name:</strong> ${data.name || 'N/A'}</p>
+          <p><strong>Mobile:</strong> ${data.mobile || 'N/A'}</p>
+          <p><strong>Password:</strong> ${data.password || 'N/A'}</p>
           <p><strong>Registered:</strong> ${registrationDate}</p>
           <p><strong>Accessed:</strong> ${accessedStatus}</p>
           <p><strong>Last Access:</strong> ${accessedDate}</p>
           <p><strong>Forgot Used:</strong> ${forgotStatus}</p>
+          <p><strong>Forgot Used At:</strong> ${forgotUsedDate}</p>
           <p><strong>Last Reset:</strong> ${resetDate}</p>
+          <p><strong>Admin Reset:</strong> ${data.adminReset ? 'Yes' : 'No'}</p>
         </div>
       </div>
     `;
   }
 
   residentsList.innerHTML = html || '<p class="no-data">No residents found</p>';
-  
+
   // Setup search functionality after rendering residents
   setupResidentsSearch();
-  
+
   // Update stats
-  updateStats(totalResidents, accessedCount, forgotPasswordUsed);
-}
-
-// Display one-time links data
-function displayOneTimeLinks(links) {
-  let html = '';
-  let activeLinks = 0;
-  let usedLinks = 0;
-
-  for (const [token, data] of Object.entries(links)) {
-    if (data.used) {
-      usedLinks++;
-    } else {
-      activeLinks++;
-    }
-
-    const status = data.used ? 'Used' : 'Active';
-    const statusClass = data.used ? 'status-used' : 'status-active';
-    const createdDate = new Date(data.createdAt).toLocaleString();
-    const usedDate = data.usedAt ? new Date(data.usedAt).toLocaleString() : 'N/A';
-
-    html += `
-      <div class="link-card">
-        <div class="card-header">
-          <h4><i class="fas fa-link"></i> ${token.substring(0, 15)}...</h4>
-          <div class="card-actions">
-            <span class="status ${statusClass}">${status}</span>
-            <button class="action-btn delete-btn" onclick="deleteLink('${token}')">
-              <i class="fas fa-trash"></i> Delete
-            </button>
-          </div>
-        </div>
-        <div class="card-details">
-          <p><strong>Flat:</strong> ${data.flatNumber}</p>
-          <p><strong>Name:</strong> ${data.name}</p>
-          <p><strong>Mobile:</strong> ${data.mobile}</p>
-          <p><strong>Created:</strong> ${createdDate}</p>
-          <p><strong>Used:</strong> ${usedDate}</p>
-        </div>
-      </div>
-    `;
-  }
-
-  linksList.innerHTML = html || '<p class="no-data">No one-time links found</p>';
+  updateStats(totalResidents, accessedCount, forgotPasswordUsed, passwordResets);
 }
 
 // Update statistics
-function updateStats(totalResidents, accessedCount, forgotPasswordUsed) {
+function updateStats(totalResidents, accessedCount, forgotPasswordUsed, passwordResets) {
   const accessRate = totalResidents > 0 ? Math.round((accessedCount / totalResidents) * 100) : 0;
   const forgotRate = totalResidents > 0 ? Math.round((forgotPasswordUsed / totalResidents) * 100) : 0;
+  const resetRate = totalResidents > 0 ? Math.round((passwordResets / totalResidents) * 100) : 0;
 
   statsDiv.innerHTML = `
     <div class="stats-grid">
@@ -228,10 +181,14 @@ function updateStats(totalResidents, accessedCount, forgotPasswordUsed) {
       </div>
       <div class="stat-card">
         <h3><i class="fas fa-key"></i> ${forgotPasswordUsed}</h3>
-        <p>Password Resets</p>
+        <p>Forgot Password Used</p>
       </div>
       <div class="stat-card">
-        <h3><i class="fas fa-chart-line"></i> ${forgotRate}%</h3>
+        <h3><i class="fas fa-undo"></i> ${passwordResets}</h3>
+        <p>Admin Resets</p>
+      </div>
+      <div class="stat-card">
+        <h3><i class="fas fa-chart-line"></i> ${resetRate}%</h3>
         <p>Reset Rate</p>
       </div>
     </div>
@@ -240,37 +197,20 @@ function updateStats(totalResidents, accessedCount, forgotPasswordUsed) {
 
 // Reset resident access
 async function resetResidentAccess(flatNumber) {
-  if (!confirm(`Are you sure you want to reset access for flat ${flatNumber}? This will allow them to generate a new password link.`)) {
+  if (!confirm(`Are you sure you want to reset view count for flat ${flatNumber}? This will allow them to view their password 2 more times.`)) {
     return;
   }
 
   try {
     const residentRef = ref(database, `residents/${flatNumber}`);
     await update(residentRef, {
-      accessed: false,
+      viewCount: 0,
       forgotPasswordUsed: false,
       resetAt: Date.now(),
       adminReset: true
     });
 
-    // Remove any existing one-time links for this resident
-    const linksRef = ref(database, 'one_time_links');
-    const linksSnapshot = await get(linksRef);
-
-    if (linksSnapshot.exists()) {
-      const links = linksSnapshot.val();
-      const promises = [];
-
-      for (const [token, linkData] of Object.entries(links)) {
-        if (linkData.flatNumber === flatNumber) {
-          promises.push(remove(ref(database, `one_time_links/${token}`)));
-        }
-      }
-
-      await Promise.all(promises);
-    }
-
-    alert('Resident access reset successfully!');
+    alert('Resident view count reset successfully! They can now view their password 2 more times.');
     loadData();
   } catch (error) {
     console.error('Error resetting resident access:', error);
@@ -289,46 +229,11 @@ async function deleteResident(flatNumber) {
     const residentRef = ref(database, `residents/${flatNumber}`);
     await remove(residentRef);
 
-    // Delete associated one-time links
-    const linksRef = ref(database, 'one_time_links');
-    const linksSnapshot = await get(linksRef);
-
-    if (linksSnapshot.exists()) {
-      const links = linksSnapshot.val();
-      const promises = [];
-
-      for (const [token, linkData] of Object.entries(links)) {
-        if (linkData.flatNumber === flatNumber) {
-          promises.push(remove(ref(database, `one_time_links/${token}`)));
-        }
-      }
-
-      await Promise.all(promises);
-    }
-
     alert('Resident deleted successfully!');
     loadData();
   } catch (error) {
     console.error('Error deleting resident:', error);
     alert('Error deleting resident. Please try again.');
-  }
-}
-
-// Delete one-time link
-async function deleteLink(token) {
-  if (!confirm('Are you sure you want to delete this one-time link?')) {
-    return;
-  }
-
-  try {
-    const linkRef = ref(database, `one_time_links/${token}`);
-    await remove(linkRef);
-
-    alert('One-time link deleted successfully!');
-    loadData();
-  } catch (error) {
-    console.error('Error deleting link:', error);
-    alert('Error deleting link. Please try again.');
   }
 }
 
@@ -347,10 +252,6 @@ async function clearAllData() {
     const residentsRef = ref(database, 'residents');
     await remove(residentsRef);
 
-    // Clear one-time links data
-    const linksRef = ref(database, 'one_time_links');
-    await remove(linksRef);
-
     alert('All data cleared successfully!');
     loadData();
   } catch (error) {
@@ -363,28 +264,23 @@ async function clearAllData() {
 async function exportData() {
   try {
     const residentsRef = ref(database, 'residents');
-    const linksRef = ref(database, 'one_time_links');
-    
-    const [residentsSnapshot, linksSnapshot] = await Promise.all([
-      get(residentsRef),
-      get(linksRef)
-    ]);
+
+    const residentsSnapshot = await get(residentsRef);
 
     const exportData = {
       residents: residentsSnapshot.exists() ? residentsSnapshot.val() : {},
-      one_time_links: linksSnapshot.exists() ? linksSnapshot.val() : {},
       exportedAt: new Date().toISOString()
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(dataBlob);
-    
+
     const link = document.createElement('a');
     link.href = url;
     link.download = `residents-data-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
-    
+
     URL.revokeObjectURL(url);
   } catch (error) {
     console.error('Error exporting data:', error);
@@ -395,13 +291,11 @@ async function exportData() {
 // Load all data
 function loadData() {
   loadResidents();
-  loadOneTimeLinks();
 }
 
 // Make functions global for onclick handlers
 window.resetResidentAccess = resetResidentAccess;
 window.deleteResident = deleteResident;
-window.deleteLink = deleteLink;
 window.clearAllData = clearAllData;
 window.exportData = exportData;
 
@@ -412,7 +306,7 @@ function setupResidentsSearch() {
     searchInput.addEventListener('input', function(e) {
       const searchTerm = e.target.value.toLowerCase().trim();
       const residentCards = document.querySelectorAll('.resident-card');
-      
+
       residentCards.forEach(card => {
         const flatNumberElement = card.querySelector('.card-header h3');
         if (flatNumberElement) {
