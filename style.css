@@ -1,0 +1,509 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+main {
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.title {
+  margin: 0 0 1rem 0;
+  line-height: 1.15;
+  font-size: 2.5rem;
+  text-align: center;
+}
+
+.description {
+  margin: 0 0 3rem 0;
+  line-height: 1.5;
+  font-size: 1.2rem;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.lookup-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group select,
+.form-group input {
+  padding: 0.75rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group small {
+  margin-top: 0.25rem;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.lookup-btn {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.lookup-btn:hover {
+  transform: translateY(-2px);
+}
+
+.lookup-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result-container,
+.error-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.password-display h3 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.password-value {
+  background: #f8f9fa;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #28a745;
+  letter-spacing: 2px;
+  margin: 1rem 0;
+  word-break: break-all;
+}
+
+.warning {
+  color: #dc3545;
+  font-weight: 500;
+  margin: 1rem 0;
+}
+
+.error-message {
+  color: #dc3545;
+  font-weight: 500;
+  margin: 1rem 0;
+}
+
+.clear-btn {
+  padding: 0.5rem 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.clear-btn:hover {
+  background: #5a6268;
+}
+
+.info-section {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 600px;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  color: white;
+}
+
+.link-display {
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.password-link {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  word-break: break-all;
+}
+
+.password-link-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  margin: 0.5rem 0;
+  transition: transform 0.2s ease;
+}
+
+.password-link-btn:hover {
+  transform: translateY(-2px);
+}
+
+.loading-container {
+  text-align: center;
+  padding: 2rem;
+  color: #333;
+}
+
+.flat-info {
+  background: #e9ecef;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  color: #495057;
+}
+
+.flat-info p {
+  margin: 0.5rem 0;
+}
+
+.info-section ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.info-section li {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.info-section li:before {
+  content: "•";
+  color: #ffd700;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.back-button {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  z-index: 100;
+}
+
+.back-link {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  transition: background 0.3s ease;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.app-download-section {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.app-download-section h3 {
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+  min-width: 180px;
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+}
+
+.download-icon {
+  font-size: 2rem;
+}
+
+.download-text {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.download-platform {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.step-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.step-number {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.step-content h4 {
+  color: white;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.step-content p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 0.5rem;
+}
+
+.step-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.step-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .lookup-container {
+    margin: 0 1rem 2rem 1rem;
+    padding: 1.5rem;
+  }
+
+  main {
+    padding: 1rem;
+    padding-top: 5rem;
+  }
+
+  .back-button {
+    top: 1rem;
+    left: 1rem;
+  }
+
+  .download-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-item {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+}
+
+.admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .admin-login {
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+    .admin-panel {
+      display: none;
+    }
+    .admin-panel .title {
+      color: white;
+    }
+    .resident-list {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 2rem;
+      margin: 2rem 0;
+      color: #333;
+    }
+    .resident-list h3 {
+      color: #333;
+      margin-top: 0;
+    }
+    .resident-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #eee;
+      color: #333;
+    }
+    .resident-item strong {
+      color: #333;
+    }
+    .resident-item small {
+      color: #666;
+    }
+    .resident-info {
+      flex: 1;
+    }
+    .resident-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .reset-btn {
+      padding: 0.5rem 1rem;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .reset-btn:hover {
+      background: #c82333;
+    }
+    .reset-btn:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .status-accessed {
+      background: #dc3545;
+      color: white;
+    }
+    .status-unused {
+      background: #28a745;
+      color: white;
+    }
+    .logout-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      background: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+.lookup-btn:hover {
+  transform: translateY(-2px);
+}
+
+.lookup-btn:disabled,
+.forget-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

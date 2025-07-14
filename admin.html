@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Admin Panel - Society Visitor Tracking</title>
+  <link href="homepage-style.css" rel="stylesheet" type="text/css" />
+  <style>
+    .admin-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .admin-login {
+      max-width: 400px;
+      margin: 2rem auto;
+    }
+    
+    .admin-panel {
+      display: none;
+    }
+    
+    .form-container {
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 0.9rem;
+    }
+    
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.875rem;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #e6edf3;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+    }
+    
+    .form-group input::placeholder {
+      color: #8b949e;
+    }
+    
+    .form-group small {
+      margin-top: 0.25rem;
+      color: #8b949e;
+      font-size: 0.8rem;
+      display: block;
+    }
+    
+    .admin-btn {
+      padding: 0.875rem 2rem;
+      background: linear-gradient(135deg, #58a6ff, #79c0ff);
+      color: #0d1117;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+    
+    .admin-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+    }
+    
+    .admin-btn:disabled {
+      background: #30363d;
+      color: #8b949e;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .resident-list {
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .resident-list h3 {
+      color: #f0f6fc;
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.25rem;
+    }
+    
+    .resident-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #30363d;
+      color: #e6edf3;
+    }
+    
+    .resident-item:last-child {
+      border-bottom: none;
+    }
+    
+    .resident-item strong {
+      color: #f0f6fc;
+    }
+    
+    .resident-item small {
+      color: #8b949e;
+    }
+    
+    .resident-info {
+      flex: 1;
+    }
+    
+    .resident-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .reset-btn {
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, #f85149, #da3633);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .reset-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(248, 81, 73, 0.3);
+    }
+    
+    .reset-btn:disabled {
+      background: #30363d;
+      color: #8b949e;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    
+    .status-accessed {
+      background: linear-gradient(135deg, #f85149, #da3633);
+      color: white;
+    }
+    
+    .status-unused {
+      background: linear-gradient(135deg, #3fb950, #2ea043);
+      color: white;
+    }
+    
+    .logout-btn {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      padding: 0.5rem 1rem;
+      background: #30363d;
+      color: #e6edf3;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .logout-btn:hover {
+      background: #484f58;
+      transform: translateY(-1px);
+    }
+    
+    .error-container, .result-container {
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin: 1rem 0;
+    }
+    
+    .error-message {
+      color: #f85149;
+      font-weight: 500;
+      margin: 1rem 0;
+    }
+    
+    .result-message {
+      color: #e6edf3;
+      margin: 1rem 0;
+    }
+    
+    .clear-btn {
+      padding: 0.5rem 1rem;
+      background: #30363d;
+      color: #e6edf3;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+    
+    .clear-btn:hover {
+      background: #484f58;
+      transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+      .logout-btn {
+        top: 1rem;
+        right: 1rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+      }
+      
+      .resident-item {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .resident-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="container">
+      <button id="logoutBtn" class="logout-btn" style="display: none;" onclick="logout()">Logout</button>
+      
+      <div id="adminLogin" class="admin-login">
+        <div class="header">
+          <h1 class="title">Admin Access</h1>
+          <p class="subtitle">Secure administrative panel for password management</p>
+        </div>
+        
+        <div class="form-container">
+          <form id="adminLoginForm">
+            <div class="form-group">
+              <label for="adminUsername">Username:</label>
+              <input type="text" id="adminUsername" required placeholder="Enter admin username">
+            </div>
+            <div class="form-group">
+              <label for="adminPassword">Password:</label>
+              <input type="password" id="adminPassword" required placeholder="Enter admin password">
+            </div>
+            <button type="submit" class="admin-btn">Login to Admin Panel</button>
+          </form>
+          
+          <div id="loginError" class="error-container" style="display: none;">
+            <p class="error-message" id="loginErrorMessage"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="adminPanel" class="admin-panel">
+        <div class="header">
+          <h1 class="title">Admin Panel</h1>
+          <p class="subtitle">Password Management System</p>
+        </div>
+        
+        <div class="form-container">
+          <button onclick="loadResidents()" class="admin-btn">Refresh Resident List</button>
+        </div>
+
+        <div id="residentsList" class="resident-list">
+          <h3>Registered Residents</h3>
+          <div id="residentsData">
+            <p style="color: #8b949e;">Click "Refresh Resident List" to load residents</p>
+          </div>
+        </div>
+
+        <div id="adminResult" class="result-container" style="display: none;">
+          <h3 id="adminResultTitle" style="color: #f0f6fc;">Action Completed</h3>
+          <p id="adminResultMessage" class="result-message"></p>
+          <button onclick="hideAdminResult()" class="clear-btn">OK</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>

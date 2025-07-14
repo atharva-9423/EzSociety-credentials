@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>EZsociety credentials</title>
+    <link href="homepage-style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <header class="header">
+          <h1 class="title">EZsociety Credentials</h1>
+          <p class="subtitle">
+            Secure access to your EZsociety app credentials
+          </p>
+        </header>
+
+        <div class="options-grid">
+          <div class="option-card" onclick="navigateToPasswordLookup()">
+            <div class="card-header">
+              <div class="icon-circle"><i class="fas fa-key"></i></div>
+              <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">Get Your Password</h3>
+              <p class="card-subtitle">
+                Generate a one-time link to access your flat's visitor app
+                password
+              </p>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="navigateToForgetPassword()">
+            <div class="card-header">
+              <div class="icon-circle"><i class="fas fa-sync-alt"></i></div>
+              <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">Forget Password</h3>
+              <p class="card-subtitle">
+                Reset your access if you've already used your one-time password
+                link
+              </p>
+            </div>
+          </div>
+
+          <div class="option-card" onclick="navigateToInstallApp()">
+            <div class="card-header">
+              <div class="icon-circle"><i class="fas fa-mobile-alt"></i></div>
+              <div class="card-arrow"><i class="fas fa-arrow-right"></i></div>
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">Install App</h3>
+              <p class="card-subtitle">
+                Download and setup instructions for the EzSociety Visitor
+                Tracking app
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>How it works</h3>
+          <div class="steps">
+            <div class="step">
+              <span class="step-number">1</span>
+              <span class="step-text"
+                >Get your unique password for your flat</span
+              >
+            </div>
+            <div class="step">
+              <span class="step-number">2</span>
+              <span class="step-text">Download the EZsociety app</span>
+            </div>
+            <div class="step">
+              <span class="step-number">3</span>
+              <span class="step-text"
+                >Login with your flat number and password</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <footer class="footer">
+          <p>Contact society office for technical support</p>
+        </footer>
+      </div>
+    </main>
+
+    <script src="route-handler.js"></script>
+    <script src="homepage.js"></script>
+
+    <!-- Hidden admin access -->
+    <div
+      style="
+        position: fixed;
+        bottom: 5px;
+        right: 5px;
+        opacity: 0.05;
+        font-size: 8px;
+      "
+    >
+      <a href="admin.html" style="color: #333; text-decoration: none">.</a>
+    </div>
+  </body>
+</html>

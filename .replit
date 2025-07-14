@@ -1,0 +1,29 @@
+run = "vite"
+entrypoint = "index.html"
+hidden = [".config"]
+modules = ["nodejs-18", "web"]
+
+[nix]
+channel = "stable-23_05"
+
+[deployment]
+deploymentTarget = "static"
+build = ["sh", "-c", "npm run build"]
+publicDir = "dist"
+run = ["sh", "-c", "npm run preview"]
+
+[[ports]]
+localPort = 5173
+externalPort = 80
+
+[workflows]
+runButton = "Development"
+
+[[workflows.workflow]]
+name = "Development"
+author = 45011981
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"

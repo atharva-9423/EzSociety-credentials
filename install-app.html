@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Install App - Society Visitor Tracking</title>
+  <link href="homepage-style.css" rel="stylesheet" type="text/css" />
+  <style>
+    .back-button {
+      position: fixed;
+      top: 2rem;
+      left: 2rem;
+      z-index: 100;
+    }
+    
+    .back-link {
+      color: #e6edf3;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      background: rgba(28, 33, 40, 0.8);
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+    
+    .back-link:hover {
+      background: rgba(33, 38, 45, 0.9);
+      border-color: #58a6ff;
+      transform: translateY(-1px);
+    }
+    
+    .page-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding-top: 6rem;
+    }
+    
+    .download-section {
+      background: #1c2128;
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .download-section h3 {
+      color: #f0f6fc;
+      margin-bottom: 2rem;
+      font-size: 1.5rem;
+    }
+    
+    .download-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    
+    .download-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(135deg, #58a6ff, #79c0ff);
+      color: #0d1117;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      min-width: 180px;
+      box-shadow: 0 4px 12px rgba(88, 166, 255, 0.3);
+    }
+    
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
+    }
+    
+    .download-icon {
+      font-size: 2rem;
+    }
+    
+    .download-text {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+    
+    .download-platform {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .step-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: linear-gradient(145deg, #21262d, #30363d);
+      border-radius: 12px;
+      border: 1px solid #373e47;
+      box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 1px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.3s ease;
+    }
+    
+    .step-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    
+    .step-number {
+      background: linear-gradient(135deg, #58a6ff, #79c0ff);
+      color: #0d1117;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      box-shadow: 
+        0 4px 12px rgba(88, 166, 255, 0.3),
+        0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .step-content h4 {
+      color: #f0f6fc;
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    
+    .step-content p {
+      color: #e6edf3;
+      margin-bottom: 0.5rem;
+      line-height: 1.5;
+    }
+    
+    .step-link {
+      color: #58a6ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .step-link:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .back-button {
+        top: 1rem;
+        left: 1rem;
+      }
+      
+      .page-container {
+        padding-top: 5rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      
+      .download-section {
+        padding: 1.5rem;
+      }
+      
+      .download-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .step-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1.25rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <div class="container">
+      <div class="back-button">
+        <a href="index.html" class="back-link">← Back to Home</a>
+      </div>
+      
+      <div class="page-container">
+        <div class="header">
+          <h1 class="title">Install Visitor Tracking App</h1>
+          <p class="subtitle">Download and setup the EzSociety Visitor Tracking app</p>
+        </div>
+
+        <div class="download-section">
+          <h3>Download the App</h3>
+          <div class="download-buttons">
+            <a href="#" class="download-btn" onclick="downloadAndroid()">
+              <div class="download-icon">📱</div>
+              <div>
+                <div class="download-platform">Android</div>
+                <div class="download-text">Download APK</div>
+              </div>
+            </a>
+            <a href="#" class="download-btn" onclick="downloadIOS()">
+              <div class="download-icon">🍎</div>
+              <div>
+                <div class="download-platform">iOS</div>
+                <div class="download-text">App Store</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>Setup Instructions</h3>
+          <div class="steps-container">
+            <div class="step-item">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>Download the App</h4>
+                <p>Download the EzSociety Visitor Tracking app from the buttons above</p>
+                <p>For Android: Install the APK file when download completes</p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>Get Your Password</h4>
+                <p>Use the <a href="password-lookup.html" class="step-link">"Get Your Password"</a> option to generate your unique login credentials</p>
+                <p>You'll need your flat details and registered mobile number</p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>Login to the App</h4>
+                <p>Open the app and login using:</p>
+                <p><strong>Username:</strong> Your flat number (e.g., A101)</p>
+                <p><strong>Password:</strong> The unique password you received</p>
+              </div>
+            </div>
+
+            <div class="step-item">
+              <div class="step-number">4</div>
+              <div class="step-content">
+                <h4>Start Tracking Visitors</h4>
+                <p>Once logged in, you can start tracking your visitors</p>
+                <p>The app will record entry and exit times automatically</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>Need Help?</h3>
+          <ul style="list-style: none; padding: 0;">
+            <li style="margin: 0.75rem 0; padding-left: 1.5rem; position: relative; color: #e6edf3;">
+              <span style="position: absolute; left: 0; color: #58a6ff;">•</span>
+              Contact society office for technical support
+            </li>
+            <li style="margin: 0.75rem 0; padding-left: 1.5rem; position: relative; color: #e6edf3;">
+              <span style="position: absolute; left: 0; color: #58a6ff;">•</span>
+              Ensure your mobile number is registered with society
+            </li>
+            <li style="margin: 0.75rem 0; padding-left: 1.5rem; position: relative; color: #e6edf3;">
+              <span style="position: absolute; left: 0; color: #58a6ff;">•</span>
+              Keep your login credentials secure and confidential
+            </li>
+            <li style="margin: 0.75rem 0; padding-left: 1.5rem; position: relative; color: #e6edf3;">
+              <span style="position: absolute; left: 0; color: #58a6ff;">•</span>
+              Report any login issues to society management
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="route-handler.js"></script>
+  <script type="module" src="install-app.js"></script>
+</body>
+</html>
