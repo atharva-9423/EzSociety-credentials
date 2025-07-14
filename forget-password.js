@@ -293,19 +293,52 @@ window.clearResetError = function() {
   hideResults();
 }
 
-// Event listeners
-wingSelect.addEventListener('change', updateFloorOptions);
-floorSelect.addEventListener('change', updateFlatOptions);
-form.addEventListener('submit', handleForgetPassword);
+// Initialize dropdowns and event listeners after DOM is ready
+function initializeDropdowns() {
+  // Event listeners
+  if (wingSelect) wingSelect.addEventListener('change', updateFloorOptions);
+  if (floorSelect) floorSelect.addEventListener('change', updateFlatOptions);
+  if (form) form.addEventListener('submit', handleForgetPassword);
 
-// Initialize phone input to only accept numbers
-phoneInput.addEventListener('input', function(e) {
-  this.value = this.value.replace(/[^0-9]/g, '');
+  // Initialize phone input to only accept numbers
+  if (phoneInput) {
+    phoneInput.addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+  }
+
+  // Initialize name input to only accept letters and spaces
+  if (nameInput) {
+    nameInput.addEventListener('input', function(e) {
+      this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+    });
+  }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for skeleton loading to complete
+  setTimeout(initializeDropdowns, 1600);
 });
 
-// Initialize name input to only accept letters and spaces
-nameInput.addEventListener('input', function(e) {
-  this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
+// Remove skeleton loading from form elements
+function removeSkeletonLoading() {
+  const skeletonElements = document.querySelectorAll('.skeleton-loader');
+  skeletonElements.forEach(element => {
+    element.classList.remove('skeleton-loader');
+  });
+  
+  // Enable form elements
+  const formElements = document.querySelectorAll('select, input, button');
+  formElements.forEach(element => {
+    element.disabled = false;
+  });
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Remove skeleton loading and enable form after 1.5 seconds
+  setTimeout(removeSkeletonLoading, 1500);
 });
 
 console.log('Forget password system initialized');
