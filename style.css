@@ -507,3 +507,22 @@ main {
     transform: rotate(360deg);
   }
 }
+
+.skeleton-loader {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+  height: 20px;
+  margin: 5px 0;
+  pointer-events: none;
+}
+
+select:disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+select:not(:disabled) {
+  pointer-events: auto;
+}
